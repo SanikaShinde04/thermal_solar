@@ -1,0 +1,3156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SVR Solar Enterprise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* ── Login Screen ── */
+        #login-screen {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+
+        #login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 50px 45px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 30px 80px #ffffff;(0, 41%, 97%, 0.98);
+            text-align: center;
+        }
+
+        #login-box img {
+            width: 90px;
+            margin-bottom: 10px;
+        }
+
+        #login-box h2 {
+            font-weight: 800;
+            color: #1a1a2e;
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+        }
+
+        #login-box p {
+            color: #999;
+            font-size: 0.85rem;
+            margin-bottom: 28px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 13px 18px;
+            border: 2px solid #eeeeee;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .login-input:focus {
+            border-color: var(--svr-orange);
+        }
+
+        #login-error {
+            color: #2a17a7;
+            font-size: 0.82rem;
+            margin-bottom: 10px;
+            min-height: 18px;
+            font-weight: 600;
+        }
+
+        #login-attempts {
+            color: #999;
+            font-size: 0.75rem;
+            margin-top: 16px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: var(--svr-orange);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login:hover {
+            background: #7413a8;
+        }
+
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #login-screen.shake #login-box {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-10px);
+            }
+
+            40% {
+                transform: translateX(10px);
+            }
+
+            60% {
+                transform: translateX(-8px);
+            }
+
+            80% {
+                transform: translateX(8px);
+            }
+        }
+
+        :root {
+            --svr-orange: #660a4a;
+            --svr-bg: #ffffff;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4f7f6, #eef2f3);
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: 200px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 5000;
+        }
+
+        #sidebar.open {
+            transform: translateX(0);
+        }
+
+        #overlay {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2500;
+            cursor: pointer;
+        }
+
+        #overlay.show {
+            display: block;
+        }
+
+        .nav-link {
+            color: #555;
+            font-weight: 500;
+            padding: 18px 25px;
+            border-bottom: 1px solid #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .nav-link i {
+            width: 25px;
+            font-size: 1.1rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #fffaf5;
+            color: var(--svr-orange);
+            border-left: 5px solid var(--svr-orange);
+        }
+
+        .top-header {
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
+
+        .logo {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--svr-orange);
+            letter-spacing: -2px;
+        }
+
+        #main-view {
+            margin-left: 0;
+            padding: 10px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .dashboard-section {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            transition: 0.3s;
+        }
+
+        .dashboard-section:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 20px;
+            padding-bottom: 5px;
+            position: relative;
+        }
+
+        .section-header::before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 2px;
+            height: 14px;
+            width: 4px;
+            background: var(--svr-orange);
+            border-radius: 5px;
+        }
+
+        .val-hero {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: 0.3s;
+        }
+
+        .unit {
+            font-size: 1rem;
+            color: #888;
+            margin-left: 5px;
+        }
+
+        .row.text-center>div {
+            padding: 15px;
+            border-radius: 15px;
+            transition: 0.3s;
+        }
+
+        .row.text-center>div:hover {
+            background: rgba(243, 146, 33, 0.05);
+            transform: scale(1.03);
+        }
+
+        #w_speed {
+            font-weight: bold;
+            transition: color 0.5s;
+        }
+
+        #gps_val {
+            color: #28a745;
+            letter-spacing: 1px;
+        }
+
+        .btn-svr {
+            background: var(--svr-orange);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: none;
+        }
+
+        .btn-svr:hover {
+            background: #020a15;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification-bell {
+            font-size: 1.5rem;
+            color: #666;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .bell-dot {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 10px;
+            width: 10px;
+            background: red;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .status-led {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            margin: 10px auto;
+            background: #ccc;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+            transition: 0.3s;
+        }
+
+        .sidebar-logo-container {
+            padding: 25px 22px;
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 10px;
+        }
+
+        .logo-img {
+            width: 100px;
+            height: 60px;
+            object-fit: contain;
+            margin-right: 12px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .logo-text b {
+            display: block;
+            font-size: 1.1rem;
+            color: #1a2a3a;
+            letter-spacing: 0.5px;
+            line-height: 1;
+        }
+
+        .logo-text small {
+            font-size: 0.65rem;
+            color: #0825dc;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .status-card {
+            padding: 15px;
+            border-radius: 12px;
+            background: #1e1e2f;
+            color: white;
+        }
+
+        .led {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background: red;
+            box-shadow: 0 0 10px rgba(117, 3, 3, 0.7);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--svr-orange);
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* SPLASH */
+        #splash {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .splash-logo {
+            width: 300px;
+            opacity: 0.2;
+            animation: glowLogo 2.5s ease-in-out forwards;
+        }
+
+        .loading-text {
+            color: #aaa;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            animation: fadeText 2.5s ease-in-out;
+        }
+
+        /* ── Login Success Animation ── */
+        #login-success-overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 999999;
+        }
+
+        #login-success-overlay img {
+            width: 280px;
+            opacity: 0;
+            transform: scale(0.85);
+            animation: none;
+        }
+
+        #login-success-overlay .success-text {
+            color: #aaa;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            opacity: 0;
+            animation: none;
+            text-transform: uppercase;
+        }
+
+        @keyframes logoReveal {
+            0% {
+                opacity: 0;
+                transform: scale(0.85);
+                filter: brightness(0.3);
+            }
+
+            40% {
+                opacity: 1;
+                transform: scale(1.06);
+                filter: brightness(1.6) drop-shadow(0 0 30px #072107);
+            }
+
+            70% {
+                opacity: 1;
+                transform: scale(1.0);
+                filter: brightness(1.2) drop-shadow(0 0 15px #061f19);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.0);
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes textFadeIn {
+            0% {
+                opacity: 0;
+                letter-spacing: 6px;
+            }
+
+            100% {
+                opacity: 1;
+                letter-spacing: 3px;
+            }
+        }
+
+        @keyframes overlayFadeOut {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes glowLogo {
+            0% {
+                opacity: 0.2;
+                transform: scale(0.9);
+                filter: brightness(0.5);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+                filter: brightness(1.5) drop-shadow(0 0 25px #3d21f3);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes fadeText {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        #mode_badge {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* ── RTC / Sun stepper shared styles ── */
+        .stepper-box {
+            text-align: center;
+        }
+
+        .stepper-val {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--svr-orange);
+            line-height: 1.2;
+            min-width: 64px;
+            display: inline-block;
+        }
+
+        .stepper-val.year-val {
+            font-size: 1.8rem;
+            min-width: 80px;
+        }
+
+        .stepper-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            background: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px auto;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .stepper-btn:hover {
+            border-color: var(--svr-orange);
+            color: var(--svr-orange);
+        }
+
+        .stepper-label {
+            font-size: 0.7rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .stepper-sep {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ccc;
+            align-self: center;
+            padding-bottom: 8px;
+        }
+        /* =========================================
+HEAT MAP
+========================================= */
+
+.heat-cell{
+    height:120px;
+    border-radius:16px;
+    transition:0.5s;
+    box-shadow:0 0 20px rgba(0,0,0,0.2);
+}
+
+/* =========================================
+PULSE ANIMATION
+========================================= */
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.05);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+/* =========================================
+ALERT ANIMATION
+========================================= */
+
+.alert-danger{
+
+    animation:blinkAlert 1s infinite;
+
+}
+
+@keyframes blinkAlert{
+
+    0%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:0.6;
+    }
+
+    100%{
+        opacity:1;
+    }
+
+}
+    </style>
+</head>
+
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div id="login-box">
+            <img src="static/SVR logo.png" alt="SVR Logo">
+            <h2>SVR Solar Enterprise</h2>
+            <p>Sign in to access the control dashboard</p>
+
+            <input type="text" id="login_id" class="login-input" placeholder="User ID" autocomplete="username"
+                onkeydown="if(event.key==='Enter') document.getElementById('login_pass').focus()">
+
+            <input type="password" id="login_pass" class="login-input" placeholder="Password"
+                autocomplete="current-password" onkeydown="if(event.key==='Enter') attemptLogin()">
+
+            <div id="login-error"></div>
+
+            <button class="btn-login" id="login-btn" onclick="attemptLogin()">
+                SIGN IN
+            </button>
+
+            <div id="login-attempts"></div>
+        </div>
+    </div>
+
+    <div id="login-success-overlay">
+        <img id="success-logo" src="static/SVR logo.png" alt="SVR Logo">
+        <div class="success-text" id="success-text">Initializing Dashboard...</div>
+    </div>
+
+    <!-- SPLASH -->
+    <div id="splash">
+        <img src="static/SVR logo.png" class="splash-logo" alt="SVR Logo">
+        <div class="loading-text">Initializing System...</div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+        <div class="sidebar-logo-container">
+            <img src="static/SVR logo.png" class="logo-img" style="width:50px;height:50px;" alt="SVR">
+            <div class="logo-text"><b>SVR SOLAR</b><br><small>Enterprise</small></div>
+        </div>
+        <div class="nav-link active" onclick="switchDash(1,this)"><i class="fa-solid"></i>🖥️Operational
+            Monitor</div>
+        <div class="nav-link" onclick="switchDash(2,this)"><i class="fa-solid"></i>🟢System Status</div>
+        <div class="nav-link" onclick="switchDash(4,this)"><i class="fa-solid"></i>♻️Solar Control</div>
+        <div class="nav-link" onclick="switchDash(3,this)"><i class="fa-solid"></i>📊Performance &amp;
+            Energy</div>
+        <div class="nav-link" onclick="switchDash(5,this)"><i class="fa-solid"></i>📡Telemetry Logs</div>
+    </div>
+
+    <div id="overlay" onclick="toggleSidebar()"></div>
+    
+        
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-light border" onclick="toggleSidebar()"
+                style="font-size:1.3rem;padding:4px 12px;">&#9776;</button>
+            <div class="logo">
+                <img src="static/SVR logo.png" alt="SVR Logo" class="logo-img" style="height:40px;width:auto;">
+            </div>
+            <div class="logo-text"><b>SOLAR THERMAL ENERGY</b></div>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center me-4">
+                <div class="me-3" style="font-family:monospace;text-align:right;line-height:1.2;">
+                    <div id="rtc_clock" class="fw-bold text-muted" style="font-size:1.1rem;">--:--:--</div>
+                    <div id="rtc_date_display" class="text-muted" style="font-size:0.75rem;letter-spacing:0.5px;">
+                        ----/--/--</div>
+                </div>
+                <span id="mode_badge" class="bg-success text-white me-2">AUTO</span>
+            </div>
+
+            <div class="dropdown me-4">
+                <div class="notification-bell" data-bs-toggle="dropdown">
+                    <i class="fa-regular fa-bell"></i><span class="bell-dot"></span>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow p-3" id="notif_menu"
+                    style="width:300px;border-radius:12px;">
+                    <li class="fw-bold mb-2">Recent Alerts</li>
+                    <li class="small text-muted">No alerts yet</li>
+                </ul>
+            </div>
+
+            <div class="dropdown">
+                <div class="d-flex align-items-center" style="cursor:pointer" data-bs-toggle="dropdown">
+                    <img id="header_avatar" src="https://ui-avatars.com/api/?name=user&background=f39221&color=fff"
+                        class="rounded-circle me-2" width="40" alt="avatar">
+                    <div><b id="profile_name">name</b><br><small id="profile_role_sub"
+                            class="text-muted">role</small></div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius:12px;">
+                    <li class="p-3 border-bottom">
+                        <b>Position:</b> <span id="profile_pos">position</span><br>
+                        <b>Email:</b> <span id="profile_email">email</span>
+                    </li>
+                    <li><a class="dropdown-item py-2 text-primary fw-bold" href="#" data-bs-toggle="modal"
+                            data-bs-target="#profileModal">
+                            <i class="fa-solid fa-user-plus me-2"></i> Create Profile
+                        </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-view">
+
+        <!-- DASH 1: Operational Monitor -->
+        <div id="dash1" class="dash-view">
+            <h3 class="fw-bold mb-4">Operational Monitor</h3>
+            <div class="dashboard-section">
+                <div class="section-header">Section 1: Live Telemetry</div>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <small class="text-muted d-block mb-1">Servo Pulse [Cur/Tar]</small>
+                        <div style="font-size:1.6rem;font-weight:700;">
+                            <span id="c_pulse">0</span><span class="text-muted"> / </span><span id="t_pulse">0</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 border-start">
+                        <small class="text-muted d-block mb-1">Actuator Pulse [Cur / Tgt]</small>
+                        <div style="font-size:1.6rem;font-weight:700;">
+                            <span id="act_pulse">0</span><span class="text-muted"> / </span><span
+                                id="act_target">0</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 border-start border-end">
+                        <small class="text-muted d-block mb-1">Azimuth &amp; Elevation Angles (Actual / Calc)</small>
+                        <div style="font-size:1.6rem;font-weight:700;">
+                            <span id="az_actual">0.0</span>° <span class="text-muted">|</span> <span
+                                id="el_actual">0.0</span>°
+                        </div>
+                        <small class="text-secondary fw-bold">Calc: <span id="c_az">0.0</span>° / <span
+                                id="c_el">0.0</span>°</small>
+                    </div>
+                    <div class="col-md-2 border-end text-center" id="wind_card">
+                        <small class="text-muted d-block mb-1">Wind Speed</small>
+                        <div style="font-size:1.6rem;font-weight:700;" id="w_speed" style="transition:color 0.5s;">0
+                        </div>
+                        <span class="unit">m/s</span>
+                        <div class="mt-2 small">Limit: <span id="w_limit">0</span></div>
+                        <div id="wind_status" class="fw-bold mt-1"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted d-block mb-1">GPS</small>
+                        <div class="fw-bold fs-5 text-primary mt-2" id="gps_val">00, 00</div>
+                        <small class="text-muted">Lat / Long</small>
+                    </div>
+                    <div class="col-md-3">
+                        <small class="text-muted d-block mb-1">Sunrise / Sunset</small>
+                        <div class="fw-bold fs-5 text-primary mt-2" id="day_window">00 / 00</div>
+                        <small class="text-muted">AM / PM</small>
+                    </div>
+                    <div class="col-md-3 border-start">
+                        <small class="text-muted d-block mb-1">Temperature</small>
+                        <div style="font-size:1.6rem;font-weight:700;" id="tc_avg">0</div>
+                        <span class="unit">°C</span>
+                    </div>
+                    <div class="col-md-12 mt-4">
+                        <small class="text-muted d-block mb-2">IMU</small>
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <b>Accelerometer (g)</b><br>
+                                X: <span id="ax">0</span> | Y: <span id="ay">0</span> | Z: <span id="az_imu">0</span>
+                            </div>
+                            <div class="col-md-4">
+                                <b>Gyroscope (°/s)</b><br>
+                                X: <span id="gx">0</span> | Y: <span id="gy">0</span> | Z: <span id="gz">0</span>
+                            </div>
+                            <div class="col-md-4">
+                                <b>Pitch / Roll / Yaw (°)</b><br>
+                                P: <span id="pitch">0</span> | R: <span id="roll">0</span> | Y: <span id="yaw">0</span>
+                            </div>
+                        </div>
+
+                        <!-- IMU Cross-check row -->
+                        <div class="row text-center mt-3" style="border-top:1px solid #f0f0f0; padding-top:12px;">
+                            <small class="text-muted d-block mb-2">IMU-PANAL Cross-Check</small>
+                            <div class="col-md-3">
+                                <b>EL Diff (solar−IMU)</b><br>
+                                <span id="imu_el_diff" style="font-size:1.2rem;font-weight:700;">0.00</span> °
+                                <div id="imu_el_alert_badge" style="display:none;margin-top:4px;">
+                                    <span
+                                        style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:8px;font-size:0.75rem;padding:2px 8px;">⚠
+                                        Deviation</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <b>AZ Encoder (°)</b><br>
+                                <span id="imu_enc_az" style="font-size:1.2rem;font-weight:700;">0.00</span> °
+                            </div>
+                            <div class="col-md-3">
+                                <b>IMU Roll vs Encoder</b><br>
+                                <span id="imu_vs_enc" style="font-size:1.2rem;font-weight:700;">0.00</span> °
+                            </div>
+                            <div class="col-md-3">
+                                <b>IMU Status</b><br>
+                                <span id="imu_status_text" style="font-size:1rem;font-weight:700;">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;margin-top:10px;gap:6px;">
+                <div id="solar3d"></div>
+                <div
+                    style="display:flex;gap:30px;font-size:0.8rem;font-family:monospace;color:#555;background:#f8f9fa;padding:6px 18px;border-radius:20px;border:1px solid #eee;">
+                    <span>AZ: <b id="lbl_az3d" style="color:#f39221;">0.0°</b></span>
+                    <span>EL: <b id="lbl_el3d" style="color:#2196F3;">0.0°</b></span>
+                    <span>DIR: <b id="lbl_dir3d" style="color:#333;">N</b></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASH 2: System Status -->
+        <div id="dash2" class="dash-view hidden">
+            <h3 class="fw-bold mb-4">System Status</h3>
+            <div class="dashboard-section">
+                <div class="section-header">Sensors &amp; System Health</div>
+                <div class="row text-center g-3">
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_rtc"></div>
+                            <div>RTC Status</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_wind"></div>
+                            <div>Wind Sensor</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_gps"></div>
+                            <div>GPS Status</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_temp"></div>
+                            <div>Temperature Sensor</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_prox_az"></div>
+                            <div>AZ Home Sensor</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_prox_el"></div>
+                            <div>EL Home Sensor</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_el_full"></div>
+                            <div>EL Full Limit</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_imu_ok"></div>
+                            <div>IMU Status</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_imu_alarm"></div>
+                            <div>IMU Alarm</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_wind_cool"></div>
+                            <div>Wind Cool</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_wind_park_az"></div>
+                            <div>Wind Park AZ</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_wind_park_el"></div>
+                            <div>Wind Park EL</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_night_park"></div>
+                            <div>Night Park</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_synced"></div>
+                            <div>Encoder Sync</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_ishome"></div>
+                            <div>Is Home</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_is_homing"></div>
+                            <div>Is Homing</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_night_done"></div>
+                            <div>Night Done</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_moving_home"></div>
+                            <div>Moving Home</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_tc_ok"></div>
+                            <div>TC OK</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_tc_fault"></div>
+                            <div>TC Fault</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_step_az"></div>
+                            <div>Step AZ</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_step_el"></div>
+                            <div>Step EL</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_az_home_miss"></div>
+                            <div>AZ Home Miss</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_el_home_miss"></div>
+                            <div>EL Home Miss</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_nudge_cnt"></div>
+                            <div>Nudge Cnt</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="status-card">
+                            <div class="led" id="led_el_nudge_cnt"></div>
+                            <div>EL Nudge Cnt</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASH 3: Performance & Energy -->
+        <div id="dash3" class="dash-view hidden">
+            <h3 class="fw-bold mb-4">Thermal Energy Hub</h3>
+            <div class="dashboard-section">
+                <div class="section-header">Section 1: System Capacity Details</div>
+                <div class="row text-center">
+                    <div class="col"><b class="d-block" id="sys_stat">ACTIVE</b><small class="text-muted">Status</small>
+                    </div>
+                    <div class="col"><b class="d-block" id="sys_cap">500kJh</b><small class="text-muted">Capacity</small>
+                    </div>
+                    <div class="col"><b class="d-block" id="sys_cons">120kJh</b><small
+                            class="text-muted">Consumption</small></div>
+                    <div class="col"><b class="d-block text-success" id="sys_char">85%</b><small
+                            class="text-muted">Total Charge</small></div>
+                    <div class="col"><b class="d-block" id="sys_usage">45kJh</b><small class="text-muted">Usage</small>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="dashboard-section">
+
+    <div class="section-header">
+        Section 2: Temperature Monitoring System
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-group w-100 mb-3">
+        <button class="btn btn-outline-danger btn-sm">Live</button>
+        <button class="btn btn-outline-warning btn-sm">Hourly</button>
+        <button class="btn btn-outline-primary btn-sm">Daily</button>
+    </div>
+
+    <!-- Combined TC Chart -->
+    <div class="card bg-dark p-3 mb-2 border-0 shadow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-warning mb-0">Temperature Sensors</h5>
+            <div class="d-flex gap-3" style="font-size:0.78rem;">
+                <span><span style="display:inline-block;width:12px;height:3px;background:#e74c3c;border-radius:2px;vertical-align:middle;"></span> TC1 </span>
+                <span><span style="display:inline-block;width:12px;height:3px;background:#2ecc71;border-radius:2px;vertical-align:middle;"></span> TC2 </span>
+                <span><span style="display:inline-block;width:12px;height:3px;background:#f39221;border-radius:2px;vertical-align:middle;"></span> TC3 </span>
+                <span><span style="display:inline-block;width:12px;height:3px;background:#3498db;border-radius:2px;vertical-align:middle;"></span> average </span>
+
+            </div>
+        </div>
+        <canvas id="combinedTcChart" height="190"></canvas>
+    </div>
+
+</div>
+                <div class="col-md-5">
+                    <div class="dashboard-section">
+                        <div class="section-header">Section 4: Weather Details</div>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <b id="weather_status">Loading...</b>
+                            <span id="weather_temp">--°C</span>
+                        </div>
+                        <div class="row g-2 text-center small">
+                            <div class="col-4 border-end">Mon<br><i class="fa-solid fa-cloud-sun"></i><br>28°</div>
+                            <div class="col-4 border-end">Tue<br><i class="fa-solid fa-sun"></i><br>31°</div>
+                            <div class="col-4">Wed<br><i class="fa-solid fa-sun"></i><br>32°</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-center mt-3">
+                <div class="col-md-4">
+                    <div class="dashboard-section">
+                        <h6> TC1</h6>
+                        <div class="val-hero" id="tc1_val">0 °C</div>
+                        <div id="tc1_status" class="status-led"></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dashboard-section">
+                        <h6> TC2</h6>
+                        <div class="val-hero" id="tc2_val">0 °C</div>
+                        <div id="tc2_status" class="status-led"></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="dashboard-section">
+                        <h6> TC3</h6>
+                        <div class="val-hero" id="tc3_val" style="font-size:1.6rem;">OK</div>
+                        <div id="tc3_status" class="status-led"></div>
+                    </div>
+                </div>
+ <div class="col-md-4">
+                    <div class="dashboard-section">
+                        <h6> TC3</h6>
+                        <div class="val-hero" id="avg_val" style="font-size:1.6rem;">OK</div>
+                        <div id="avg_status" class="status-led"></div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="dashboard-section">
+                <div class="section-header">Section 3: Sensors</div>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h6>Reed 1</h6>
+                        <div id="status_reed_1" class="status-led"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Reed 2</h6>
+                        <div id="status_reed_2" class="status-led"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Inductive</h6>
+                        <div id="status_proximity" class="status-led"></div>
+                    </div>
+                </div>
+            </div>
+             
+             <div class="dashboard-section">
+                <div class="section-header">Section 4: ENERGY GENERATED</div>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h6>Today</h6>
+                        <div id="energy_today" class="val-hero">0 kWJ</div>
+                    </div>
+                    <!-- =========================================
+                         ADD THESE SECTIONS INSIDE DASH 3
+                        ======================================== -->
+
+                    <!-- ===============================
+                    SYSTEM HEALTH + EFFICIENCY
+                    ================================ -->
+<div class="row mt-4">
+
+    <div class="col-md-4">
+        <div class="dashboard-section text-center">
+            <div class="section-header">System Health</div>
+
+            <div style="
+                width:160px;
+                height:160px;
+                margin:auto;
+                border-radius:50%;
+                background:conic-gradient(#2ecc71 0deg, #2ecc71 320deg, #222 320deg);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                box-shadow:0 0 30px rgba(46,204,113,0.3);
+            " id="healthCircle">
+
+                <div>
+                    <div id="healthValue"
+                        style="font-size:2.5rem;font-weight:800;color:white;">
+                        92%
+                    </div>
+
+                    <small style="color:#aaa;">HEALTH</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="dashboard-section text-center">
+
+            <div class="section-header">Solar Efficiency</div>
+
+            <div class="val-hero" id="efficiencyVal">
+                84%
+            </div>
+
+            <div class="mt-3">
+
+                <span class="badge bg-success p-2">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                    GOOD
+                </span>
+
+            </div>
+
+            <div class="mt-3 small text-muted">
+                Output / Solar Input
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="dashboard-section text-center">
+
+            <div class="section-header">Storage Tank</div>
+
+            <div style="
+                width:120px;
+                height:220px;
+                border:4px solid #777;
+                border-radius:20px;
+                margin:auto;
+                position:relative;
+                overflow:hidden;
+                background:#111;
+            ">
+
+                <div id="tankFill"
+                    style="
+                    position:absolute;
+                    bottom:0;
+                    width:100%;
+                    height:78%;
+                    background:linear-gradient(to top,#ff6b00,#ffb347);
+                    transition:1s;
+                "></div>
+
+                <div style="
+                    position:absolute;
+                    width:100%;
+                    text-align:center;
+                    top:50%;
+                    transform:translateY(-50%);
+                    font-size:2rem;
+                    font-weight:700;
+                    color:white;
+                " id="tankPercent">
+                    78%
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ===================================
+ALERT PANEL
+=================================== -->
+
+<div class="dashboard-section mt-4">
+
+    <div class="section-header">
+        System Alerts
+    </div>
+
+    <div id="alertPanel">
+
+        <div class="alert alert-success">
+            ✅ System Operating Normally
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ===================================
+ENERGY TREND GRAPH
+=================================== -->
+
+<div class="dashboard-section mt-4">
+
+    <div class="section-header">
+        Energy Generation 
+    </div>
+
+    <div style="height:300px;">
+        <canvas id="energyChart"></canvas>
+    </div>
+
+</div>
+
+
+
+<!-- ===================================
+THERMAL HEAT MAP
+=================================== -->
+
+<div class="dashboard-section mt-4">
+
+    <div class="section-header">
+        Thermal Heat Map
+    </div>
+
+    <div class="row text-center">
+
+        <div class="col">
+            <div class="heat-cell" id="heat1"></div>
+        </div>
+
+        <div class="col">
+            <div class="heat-cell" id="heat2"></div>
+        </div>
+
+        <div class="col">
+            <div class="heat-cell" id="heat3"></div>
+        </div>
+
+        <div class="col">
+            <div class="heat-cell" id="heat4"></div>
+        </div>
+
+        <div class="col">
+            <div class="heat-cell" id="heat5"></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ===================================
+SOLAR TRACKER STATUS
+=================================== -->
+
+<div class="dashboard-section mt-4 text-center">
+
+    <div class="section-header">
+        Solar Tracker Status
+    </div>
+
+    <div id="trackerStatus"
+        style="
+        font-size:2rem;
+        font-weight:700;
+        color:#2ecc71;
+        animation:pulse 1s infinite ">
+
+        TRACKING SUN ☀️
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+      
+        
+        <!-- DASH 4: Solar Control -->
+        <div id="dash4" class="dash-view hidden">
+            <h3 class="fw-bold mb-4">Solar Panel Control</h3>
+            <p class="text-center text-muted mb-4">Manual controls allow direct intervention. Auto Mode automatically
+                adjusts the solar panels for optimal performance.</p>
+
+            <div style="display:flex;gap:20px;justify-content:center;margin-bottom:20px;align-items:center;">
+                <button class="btn btn-success" id="autoBtn" onclick="requestSetMode('auto')">Auto Mode</button>
+                <button class="btn btn-outline-secondary" id="manualBtn" onclick="requestSetMode('manual')">Manual
+                    Mode</button>
+                <span class="text-muted small">Pico mode: <b id="pico_mode_label">--</b></span>
+            </div>
+
+            <div id="manualControls" style="display:none;text-align:center;">
+
+                <!-- MAIN MENU -->
+                <div id="manualMenu">
+                    <button onclick="openPanel('rtc')" class="btn btn-svr m-2">Time &amp; Date</button>
+                    <button onclick="openPanel('gps')" class="btn btn-svr m-2">Set Location</button>
+                    <button onclick="openPanel('wind')" class="btn btn-svr m-2">Set Wind Limit</button>
+                    <button onclick="openPanel('actuator')" class="btn btn-svr m-2">Actuator JOG</button>
+                    <button onclick="openPanel('servo')" class="btn btn-svr m-2">Servo JOG</button>
+                    <button onclick="openPanel('sun')" class="btn btn-svr m-2">Sunrise/Sunset</button>
+                </div>
+
+                <!-- RTC PANEL -->
+                <div id="panel_rtc" class="hidden">
+                    <button class="back-btn" onclick="goBack()">← Back</button>
+
+                    <div style="max-width:420px;margin:auto;">
+
+                        <div class="small fw-bold text-muted text-start mb-2">DATE</div>
+                        <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
+
+                            <div class="stepper-box">
+                                <button class="stepper-btn" onclick="adjustRTC('day',1)">▲</button>
+                                <div class="stepper-val" id="rtc_day_display">01</div>
+                                <div class="stepper-label">Day</div>
+                                <button class="stepper-btn" onclick="adjustRTC('day',-1)">▼</button>
+                            </div>
+
+                            <div class="stepper-sep">/</div>
+
+                            <div class="stepper-box">
+                                <button class="stepper-btn" onclick="adjustRTC('month',1)">▲</button>
+                                <div class="stepper-val" id="rtc_month_display">01</div>
+                                <div class="stepper-label">Month</div>
+                                <button class="stepper-btn" onclick="adjustRTC('month',-1)">▼</button>
+                            </div>
+
+                            <div class="stepper-sep">/</div>
+
+                            <div class="stepper-box">
+                                <button class="stepper-btn" onclick="adjustRTC('year',1)">▲</button>
+                                <div class="stepper-val year-val" id="rtc_year_display">2025</div>
+                                <div class="stepper-label">Year</div>
+                                <button class="stepper-btn" onclick="adjustRTC('year',-1)">▼</button>
+                            </div>
+
+                        </div>
+
+                        <div class="small fw-bold text-muted text-start mb-2">TIME</div>
+                        <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
+
+                            <div class="stepper-box">
+                                <button class="stepper-btn" onclick="adjustRTC('hour',1)">▲</button>
+                                <div class="stepper-val" id="rtc_hour_display">00</div>
+                                <div class="stepper-label">Hour</div>
+                                <button class="stepper-btn" onclick="adjustRTC('hour',-1)">▼</button>
+                            </div>
+
+                            <div class="stepper-sep">:</div>
+
+                            <div class="stepper-box">
+                                <button class="stepper-btn" onclick="adjustRTC('minute',1)">▲</button>
+                                <div class="stepper-val" id="rtc_minute_display">00</div>
+                                <div class="stepper-label">Min</div>
+                                <button class="stepper-btn" onclick="adjustRTC('minute',-1)">▼</button>
+                            </div>
+
+                            <div class="stepper-sep">:</div>
+
+                            <div class="stepper-box">
+                                <button class="stepper-btn" onclick="adjustRTC('second',1)">▲</button>
+                                <div class="stepper-val" id="rtc_second_display">00</div>
+                                <div class="stepper-label">Sec</div>
+                                <button class="stepper-btn" onclick="adjustRTC('second',-1)">▼</button>
+                            </div>
+
+                        </div>
+
+                        <input type="hidden" id="rtc_day_val" value="1">
+                        <input type="hidden" id="rtc_month_val" value="1">
+                        <input type="hidden" id="rtc_year_val" value="2025">
+                        <input type="hidden" id="rtc_hour_val" value="0">
+                        <input type="hidden" id="rtc_minute_val" value="0">
+                        <input type="hidden" id="rtc_second_val" value="0">
+
+                        <button class="btn btn-svr w-100" onclick="setRTC()">Queue RTC</button>
+                    </div>
+                </div>
+          
+
+                <!-- GPS PANEL -->
+                <div id="panel_gps" class="hidden">
+                    <button class="back-btn" onclick="goBack()">← Back</button>
+                    <input type="number" id="lat_input" placeholder="Latitude" class="form-control mb-1"
+                        style="max-width:300px;margin:auto;">
+                    <input type="number" id="lon_input" placeholder="Longitude" class="form-control mb-2"
+                        style="max-width:300px;margin:auto;">
+                    <label class="small fw-bold">Region / Time Zone</label>
+                    <select id="tz_select" class="form-select mb-2" style="max-width:300px;margin:auto;">
+                        <option value="-12">UTC-12:00 — Baker Island</option>
+                        <option value="-11">UTC-11:00 — Samoa</option>
+                        <option value="-10">UTC-10:00 — Hawaii</option>
+                        <option value="-9">UTC-09:00 — Alaska</option>
+                        <option value="-8">UTC-08:00 — Los Angeles (PST)</option>
+                        <option value="-7">UTC-07:00 — Denver (MST)</option>
+                        <option value="-6">UTC-06:00 — Chicago (CST)</option>
+                        <option value="-5">UTC-05:00 — New York (EST)</option>
+                        <option value="-4">UTC-04:00 — Halifax (AST)</option>
+                        <option value="-3.5">UTC-03:30 — Newfoundland</option>
+                        <option value="-3">UTC-03:00 — São Paulo (BRT)</option>
+                        <option value="0">UTC+00:00 — London (GMT)</option>
+                        <option value="1">UTC+01:00 — Paris (CET)</option>
+                        <option value="2">UTC+02:00 — Cairo (EET)</option>
+                        <option value="3">UTC+03:00 — Moscow / Riyadh</option>
+                        <option value="3.5">UTC+03:30 — Tehran</option>
+                        <option value="4">UTC+04:00 — Dubai (GST)</option>
+                        <option value="4.5">UTC+04:30 — Kabul</option>
+                        <option value="5">UTC+05:00 — Karachi (PKT)</option>
+                        <option value="5.5">UTC+05:30 — Mumbai / Pune (IST)</option>
+                        <option value="5.75">UTC+05:45 — Kathmandu (NPT)</option>
+                        <option value="6">UTC+06:00 — Dhaka (BST)</option>
+                        <option value="6.5">UTC+06:30 — Yangon (MMT)</option>
+                        <option value="7">UTC+07:00 — Bangkok (ICT)</option>
+                        <option value="8">UTC+08:00 — Singapore / Beijing</option>
+                        <option value="9">UTC+09:00 — Tokyo (JST)</option>
+                        <option value="9.5">UTC+09:30 — Adelaide (ACST)</option>
+                        <option value="10">UTC+10:00 — Sydney (AEST)</option>
+                        <option value="11">UTC+11:00 — Solomon Islands</option>
+                        <option value="12">UTC+12:00 — Auckland (NZST)</option>
+                        <option value="13">UTC+13:00 — Samoa (DST)</option>
+                        <option value="14">UTC+14:00 — Line Islands</option>
+                    </select>
+                    <button class="btn btn-svr" onclick="setGPS()">Queue GPS</button>
+                </div>
+
+                <!-- WIND PANEL -->
+                <div id="panel_wind" class="hidden">
+                    <button class="back-btn" onclick="goBack()">← Back</button>
+                    <label class="small fw-bold mb-1">Wind Threshold (m/s)</label>
+                    <input type="number" id="wind_input" class="form-control mb-2" placeholder="e.g. 12"
+                        style="max-width:300px;margin:auto;">
+                    <button class="btn btn-svr" onclick="setWind()">Queue Wind Limit</button>
+                </div>
+
+                <!-- ACTUATOR JOG PANEL -->
+                <div id="panel_actuator" class="hidden">
+                    <button class="back-btn" onclick="goBack()">← Back</button>
+                    <div class="d-flex justify-content-center gap-3 mt-3">
+                        <button class="btn btn-primary px-4" onmousedown="startElJog(1)" onmouseup="stopElJog()"
+                            onmouseleave="stopElJog()" ontouchstart="startElJog(1)" ontouchend="stopElJog()">▲
+                            EXTEND</button>
+                        <button class="btn btn-primary px-4" onmousedown="startElJog(-1)" onmouseup="stopElJog()"
+                            onmouseleave="stopElJog()" ontouchstart="startElJog(-1)" ontouchend="stopElJog()">▼
+                            RETRACT</button>
+                    </div>
+                    <p class="text-muted small mt-3">Hold button to jog , Release to stop.</p>
+                </div>
+
+                <!-- SERVO JOG PANEL -->
+                <div id="panel_servo" class="hidden">
+                    <button class="back-btn" onclick="goBack()">← Back</button>
+                    <div class="d-flex justify-content-center gap-3 mt-3">
+                        <button class="btn btn-primary px-4" onmousedown="startAzJog(-1)" onmouseup="stopAzJog()"
+                            onmouseleave="stopAzJog()" ontouchstart="startAzJog(-1)" ontouchend="stopAzJog()">◀
+                            CCW</button>
+                        <button class="btn btn-primary px-4" onmousedown="startAzJog(1)" onmouseup="stopAzJog()"
+                            onmouseleave="stopAzJog()" ontouchstart="startAzJog(1)" ontouchend="stopAzJog()">▶
+                            CW</button>
+                    </div>
+                    <p class="text-muted small mt-3">Hold button to jog , Release to stop.</p>
+                </div>
+
+                <!-- SUN PANEL -->
+                <div id="panel_sun" class="hidden">
+                    <button class="back-btn" onclick="goBack()">← Back</button>
+
+                    <div style="max-width:320px;margin:auto;">
+
+                        <div class="small fw-bold text-muted text-start mb-2">SUNRISE HOUR</div>
+                        <div class="d-flex justify-content-center align-items-center gap-3 mb-4">
+                            <button class="stepper-btn" style="width:44px;height:44px;font-size:1.3rem;"
+                                onclick="adjustHour('sunrise_hour',-1)">−</button>
+                            <div>
+                                <div class="stepper-val" id="sunrise_display">06</div>
+                                <div class="stepper-label">:00</div>
+                            </div>
+                            <button class="stepper-btn" style="width:44px;height:44px;font-size:1.3rem;"
+                                onclick="adjustHour('sunrise_hour',1)">+</button>
+                        </div>
+
+                        <div class="small fw-bold text-muted text-start mb-2">SUNSET HOUR</div>
+                        <div class="d-flex justify-content-center align-items-center gap-3 mb-4">
+                            <button class="stepper-btn" style="width:44px;height:44px;font-size:1.3rem;"
+                                onclick="adjustHour('sunset_hour',-1)">−</button>
+                            <div>
+                                <div class="stepper-val" id="sunset_display">19</div>
+                                <div class="stepper-label">:00</div>
+                            </div>
+                            <button class="stepper-btn" style="width:44px;height:44px;font-size:1.3rem;"
+                                onclick="adjustHour('sunset_hour',1)">+</button>
+                        </div>
+
+                        <input type="hidden" id="sunrise_hour" value="6">
+                        <input type="hidden" id="sunset_hour" value="19">
+
+                        <button class="btn btn-svr w-100" onclick="setSun()">Queue Sun Window</button>
+                    </div>
+                </div>
+
+                <!-- APPLY button -->
+                <div class="mt-4">
+                    <button class="btn btn-success px-5" onclick="sendAll()">✔ APPLY &amp; RESUME AUTO</button>
+                </div>
+
+                <div class="mt-2 small text-muted" id="queue_summary"></div>
+            </div>
+        </div>
+    </div>
+</div>
+        <!-- DASH 5: Telemetry Logs -->
+        <div id="dash5" class="dash-view hidden">
+            <h3 class="fw-bold mb-4">Telemetry Logs</h3>
+            <div class="dashboard-section">
+                <canvas id="telemetryChart" height="120"></canvas>
+            </div>
+            <div class="dashboard-section">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>TC1</th>
+                            <th>TC2</th> 
+                            <th>TC3</th>           
+                            <th>TC Avg</th>
+                            <th>Az</th>
+                            <th>El</th>
+                            <th>Wind</th>
+                        </tr>
+                    </thead>
+                    <tbody id="telemetryTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius:20px;border:none;">
+                <div class="modal-header border-0 p-4">
+                    <h5 class="modal-title fw-bold">Create New Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">User ID <span class="text-danger">*</span></label>
+                        <input type="text" id="new_userid" class="form-control"
+                            placeholder="e.g. john.doe (used to login)" autocomplete="off">
+                        <small class="text-muted">This will be your login username — no spaces allowed</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Full Name</label>
+                        <input type="text" id="new_name" class="form-control" placeholder="Enter Name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Email Address</label>
+                        <input type="email" id="new_email" class="form-control" placeholder="name@company.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Position / Role</label>
+                        <select id="new_role" class="form-select">
+                            <option value="Creator">Creator</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Viewer">Viewer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Profile Photo</label>
+                        <input type="file" id="profile_photo" class="form-control">
+                        <small class="text-muted">Optional: JPG/PNG</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Password</label>
+                        <input type="password" id="new_pass" class="form-control" placeholder="Set login password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Confirm Password</label>
+                        <input type="password" id="confirm_pass" class="form-control" placeholder="Repeat password">
+                    </div>
+                    <button class="btn btn-svr w-100 py-3 mt-3" onclick="saveProfile()" id="create-profile-btn">
+                        AUTHORIZE &amp; CREATE PROFILE
+                    </button>
+                    <div class="text-center mt-2">
+                        <small id="profile-slot-count" class="text-muted">Loading slots...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+
+    <script>
+        // =========================================================================
+        //  LOGIN
+        // =========================================================================
+        const DEFAULT_USERS = {
+            "admin": "svrad@123",
+            "operator": "svr@op456",
+            "viewer": "svr@view789"
+        };
+
+        function updateProfileSlotCount() {
+            const saved = JSON.parse(localStorage.getItem('svr_profiles') || '{}');
+            const used = Object.keys(saved).length;
+            const remaining = 5 - used;
+            const el = document.getElementById('profile-slot-count');
+            const btn = document.getElementById('create-profile-btn');
+            if (!el) return;
+            if (remaining <= 0) {
+                el.innerHTML = '<span style="color:red;">⚠ All 5 profile slots used</span>';
+                if (btn) btn.disabled = true;
+            } else {
+                el.textContent = `${used} / 5 profiles used — ${remaining} slot${remaining !== 1 ? 's' : ''} remaining`;
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        function loadUsers() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('svr_profiles') || '{}');
+                return Object.assign({}, DEFAULT_USERS, saved);
+            } catch (e) { return Object.assign({}, DEFAULT_USERS); }
+        }
+
+        let USERS = loadUsers();
+
+        const MAX_ATTEMPTS = 5;
+        const LOCKOUT_MS = 60000;
+
+        let loginAttempts = 0;
+        let lockedUntil = 0;
+
+        function attemptLogin() {
+            const now = Date.now();
+            const errorEl = document.getElementById('login-error');
+            const attEl = document.getElementById('login-attempts');
+            const btn = document.getElementById('login-btn');
+
+            if (now < lockedUntil) {
+                const secsLeft = Math.ceil((lockedUntil - now) / 1000);
+                errorEl.innerText = `Too many attempts. Try again in ${secsLeft}s.`;
+                return;
+            }
+
+            const id = document.getElementById('login_id').value.trim();
+            const pass = document.getElementById('login_pass').value;
+
+            if (!id || !pass) {
+                errorEl.innerText = "Please enter both User ID and Password.";
+                return;
+            }
+
+            if (USERS[id] && USERS[id] === pass) {
+                loginAttempts = 0;
+                errorEl.innerText = "";
+                attEl.innerText = "";
+
+                sessionStorage.setItem('svr_auth', btoa(id + ':' + now));
+                window._loggedInUser = id;
+
+                try {
+                    const avatars = JSON.parse(localStorage.getItem('svr_avatars') || '{}');
+                    if (avatars[id]) document.getElementById('header_avatar').src = avatars[id];
+                    else document.getElementById('header_avatar').src =
+                        "https://ui-avatars.com/api/?name=" + encodeURIComponent(id) + "&background=f39221&color=fff";
+                    const meta = JSON.parse(localStorage.getItem('svr_profile_meta') || '{}');
+                    if (meta[id]) {
+                        document.getElementById('profile_email').innerText = meta[id].email || '';
+                        document.getElementById('profile_pos').innerText = meta[id].pos || '';
+                    }
+                } catch (e) { }
+
+                document.getElementById('login_id').value = "";
+                document.getElementById('login_pass').value = "";
+
+                const screen = document.getElementById('login-screen');
+                screen.style.transition = "opacity 0.35s";
+                screen.style.opacity = "0";
+
+                setTimeout(() => {
+                    screen.style.display = "none";
+
+                    const overlay = document.getElementById('login-success-overlay');
+                    const logoImg = document.getElementById('success-logo');
+                    const successTxt = document.getElementById('success-text');
+
+                    overlay.style.display = "flex";
+                    overlay.style.opacity = "1";
+
+                    logoImg.style.animation = "logoReveal 2s ease forwards";
+                    successTxt.style.animation = "textFadeIn 1.2s ease 0.6s forwards";
+
+                    setTimeout(() => {
+                        overlay.style.transition = "opacity 0.5s";
+                        overlay.style.opacity = "0";
+
+                        setTimeout(() => {
+                            overlay.style.display = "none";
+
+                            try {
+                                const meta = JSON.parse(localStorage.getItem('svr_profile_meta') || '{}');
+                                document.getElementById('profile_name').innerText = meta[id]?.name || id;
+                            } catch (e) {
+                                document.getElementById('profile_name').innerText = id;
+                            }
+                            document.getElementById('profile_role_sub').innerText = getRoleLabel(id);
+
+                            document.body.style.overflow = "auto";
+
+                        }, 500);
+                    }, 2500);
+
+                }, 350);
+
+            } else {
+                loginAttempts++;
+                const remaining = MAX_ATTEMPTS - loginAttempts;
+
+                const screen = document.getElementById('login-screen');
+                screen.classList.remove('shake');
+                void screen.offsetWidth;
+                screen.classList.add('shake');
+
+                if (loginAttempts >= MAX_ATTEMPTS) {
+                    lockedUntil = now + LOCKOUT_MS;
+                    loginAttempts = 0;
+                    btn.disabled = true;
+                    errorEl.innerText = "Account locked for 60 seconds.";
+                    attEl.innerText = "";
+
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        errorEl.innerText = "";
+                        attEl.innerText = "";
+                    }, LOCKOUT_MS);
+
+                } else {
+                    errorEl.innerText = "Incorrect User ID or Password.";
+                    attEl.innerText = remaining === 1
+                        ? "⚠ 1 attempt remaining before lockout."
+                        : `${remaining} attempts remaining.`;
+                }
+
+                document.getElementById('login_pass').value = "";
+            }
+        }
+
+        function getRoleLabel(id) {
+            const roles = { "admin": "Administrator", "operator": "Operator", "viewer": "Viewer" };
+            if (roles[id]) return roles[id];
+            try {
+                const meta = JSON.parse(localStorage.getItem('svr_profile_meta') || '{}');
+                return meta[id]?.role || "User";
+            } catch (e) { return "User"; }
+        }
+
+        (function checkSession() {
+            const token = sessionStorage.getItem('svr_auth');
+            if (token) {
+                try {
+                    const decoded = atob(token);
+                    const [user] = decoded.split(':');
+                    if (USERS[user]) {
+                        document.getElementById('login-screen').style.display = "none";
+                        document.getElementById('profile_name').innerText = user;
+                        document.getElementById('profile_role_sub').innerText = getRoleLabel(user);
+                        window._loggedInUser = user;
+
+                        try {
+                            const avatars = JSON.parse(localStorage.getItem('svr_avatars') || '{}');
+                            if (avatars[user]) document.getElementById('header_avatar').src = avatars[user];
+                            else document.getElementById('header_avatar').src =
+                                "https://ui-avatars.com/api/?name=" + encodeURIComponent(user) + "&background=f39221&color=fff";
+                        } catch (e) { }
+
+                        try {
+                            const meta = JSON.parse(localStorage.getItem('svr_profile_meta') || '{}');
+                            if (meta[user]) {
+                                document.getElementById('profile_email').innerText = meta[user].email || '';
+                                document.getElementById('profile_pos').innerText = meta[user].pos || '';
+                            }
+                        } catch (e) { }
+                        return;
+                    }
+                } catch (e) { }
+            }
+            document.body.style.overflow = "hidden";
+        })();
+
+        // =========================================================================
+        //  SIDEBAR
+        // =========================================================================
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("overlay");
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("show");
+        }
+
+        // =========================================================================
+        //  SPLASH
+        // =========================================================================
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                const splash = document.getElementById("splash");
+                splash.style.transition = "opacity 0.5s";
+                splash.style.opacity = "0";
+                setTimeout(() => {
+                    splash.style.display = "none";
+                    document.body.style.overflow = "auto";
+                }, 500);
+            }, 3000);
+        });
+
+        // =========================================================================
+        //  JOG CONTROLS
+        // =========================================================================
+        let elJogInterval = null;
+
+        function startElJog(dir) {
+            stopElJog();
+            apiPost('/api/control', { cmd: 'el_jog', dir: dir });
+            elJogInterval = setInterval(() => apiPost('/api/control', { cmd: 'el_jog', dir: dir }), 300);
+        }
+
+        function stopElJog() {
+            clearInterval(elJogInterval);
+            elJogInterval = null;
+            apiPost('/api/control', { cmd: 'el_jog', dir: 0 });
+            setTimeout(() => apiPost('/api/control', { cmd: 'el_jog', dir: 0 }), 200);
+            setTimeout(() => apiPost('/api/control', { cmd: 'el_jog', dir: 0 }), 400);
+        }
+
+        let azJogInterval = null;
+
+        function startAzJog(dir) {
+            stopAzJog();
+            apiPost('/api/control', { cmd: 'az_jog', dir: dir });
+            azJogInterval = setInterval(() => apiPost('/api/control', { cmd: 'az_jog', dir: dir }), 300);
+        }
+
+        function stopAzJog() {
+            clearInterval(azJogInterval);
+            azJogInterval = null;
+            apiPost('/api/control', { cmd: 'az_jog', dir: 0 });
+            setTimeout(() => apiPost('/api/control', { cmd: 'az_jog', dir: 0 }), 200);
+            setTimeout(() => apiPost('/api/control', { cmd: 'az_jog', dir: 0 }), 400);
+        }
+
+        // =========================================================================
+        //  UTILITIES
+        // =========================================================================
+        const safe = (v, def = 0) => (v !== undefined && v !== null && !isNaN(v)) ? v : def;
+
+        function setLED(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (Number(value) >= 1) {
+                el.style.background = "limegreen";
+                el.style.boxShadow = "0 0 15px limegreen";
+            } else {
+                el.style.background = "red";
+                el.style.boxShadow = "0 0 10px red";
+            }
+        }
+
+        // =========================================================================
+        //  API HELPERS
+        // =========================================================================
+        function apiPost(path, body) {
+            return fetch(path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-api-key': 'svr123' },
+                body: JSON.stringify(body)
+            }).then(r => r.json());
+        }
+
+        // =========================================================================
+        //  MODE SYNC
+        // =========================================================================
+        let currentMode = "auto";
+
+        function applyModeUI(mode) {
+            currentMode = mode;
+            const autoBtn = document.getElementById("autoBtn");
+            const manualBtn = document.getElementById("manualBtn");
+            const controls = document.getElementById("manualControls");
+            const badge = document.getElementById("mode_badge");
+            const picoLabel = document.getElementById("pico_mode_label");
+
+            autoBtn.className = "btn " + (mode === "auto" ? "btn-success" : "btn-outline-secondary");
+            manualBtn.className = "btn " + (mode === "manual" ? "btn-warning" : "btn-outline-secondary");
+            controls.style.display = (mode === "manual") ? "block" : "none";
+
+            if (badge) {
+                badge.textContent = mode.toUpperCase();
+                badge.className = "badge me-2 " + (mode === "auto" ? "bg-success" : "bg-warning text-dark");
+            }
+            if (picoLabel) picoLabel.textContent = mode;
+        }
+
+        let _modePending = false;
+        let _pendingMode = null;
+
+        function requestSetMode(mode) {
+            applyModeUI(mode);
+            _modePending = true;
+            _pendingMode = mode;
+            apiPost('/api/control', { cmd: "set_mode", val: mode })
+                .catch(e => console.error("setMode error:", e));
+        }
+
+        function syncModeFromTelemetry(picoMode) {
+            if (_modePending) {
+                if (picoMode === _pendingMode) {
+                    _modePending = false;
+                    _pendingMode = null;
+                    applyModeUI(picoMode);
+                }
+                return;
+            }
+            if (picoMode === currentMode) return;
+            applyModeUI(picoMode);
+        }
+
+        // =========================================================================
+        //  CONFIG BUFFER
+        // =========================================================================
+        let configBuffer = {};
+
+        function _updateQueueSummary() {
+            const keys = Object.keys(configBuffer);
+            const el = document.getElementById("queue_summary");
+            if (!el) return;
+            el.textContent = keys.length ? "Queued: " + keys.join(", ") : "";
+        }
+
+        // =========================================================================
+        //  RTC STEPPER
+        // =========================================================================
+        function _daysInMonth(month, year) {
+            return new Date(year, month, 0).getDate();
+        }
+
+        function adjustRTC(field, delta) {
+            const idMap = {
+                day: 'rtc_day_val', month: 'rtc_month_val',
+                year: 'rtc_year_val', hour: 'rtc_hour_val',
+                minute: 'rtc_minute_val', second: 'rtc_second_val'
+            };
+            const displayMap = {
+                day: 'rtc_day_display', month: 'rtc_month_display',
+                year: 'rtc_year_display', hour: 'rtc_hour_display',
+                minute: 'rtc_minute_display', second: 'rtc_second_display'
+            };
+
+            const input = document.getElementById(idMap[field]);
+            let val = parseInt(input.value) + delta;
+
+            const year = parseInt(document.getElementById('rtc_year_val').value);
+            const month = parseInt(document.getElementById('rtc_month_val').value);
+
+            if (field === 'second' || field === 'minute') {
+                if (val < 0) val = 59;
+                if (val > 59) val = 0;
+            } else if (field === 'hour') {
+                if (val < 0) val = 23;
+                if (val > 23) val = 0;
+            } else if (field === 'month') {
+                if (val < 1) val = 12;
+                if (val > 12) val = 1;
+                const dayInput = document.getElementById('rtc_day_val');
+                const maxDay = _daysInMonth(val, year);
+                if (parseInt(dayInput.value) > maxDay) {
+                    dayInput.value = maxDay;
+                    document.getElementById('rtc_day_display').innerText = String(maxDay).padStart(2, '0');
+                }
+            } else if (field === 'year') {
+                if (val < 2020) val = 2020;
+                if (val > 2099) val = 2099;
+            } else if (field === 'day') {
+                const maxDay = _daysInMonth(month, year);
+                if (val < 1) val = maxDay;
+                if (val > maxDay) val = 1;
+            }
+
+            input.value = val;
+            const display = document.getElementById(displayMap[field]);
+            if (display) {
+                display.innerText = (field === 'year') ? String(val) : String(val).padStart(2, '0');
+            }
+        }
+
+        function setRTC() {
+            const d = parseInt(document.getElementById('rtc_day_val').value);
+            const mo = parseInt(document.getElementById('rtc_month_val').value);
+            const y = parseInt(document.getElementById('rtc_year_val').value);
+            const h = parseInt(document.getElementById('rtc_hour_val').value);
+            const m = parseInt(document.getElementById('rtc_minute_val').value);
+            const s = parseInt(document.getElementById('rtc_second_val').value);
+
+            configBuffer.rtc_date = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            configBuffer.rtc_time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            alert(`RTC queued: ${configBuffer.rtc_date} ${configBuffer.rtc_time}\n(pending APPLY)`);
+            _updateQueueSummary();
+        }
+
+        // =========================================================================
+        //  GPS / WIND
+        // =========================================================================
+        function setGPS() {
+            const lat = document.getElementById('lat_input').value;
+            const lon = document.getElementById('lon_input').value;
+            const tz = document.getElementById('tz_select').value;
+            if (!lat || !lon) { alert("Enter both Latitude and Longitude"); return; }
+            configBuffer.lat = parseFloat(lat);
+            configBuffer.lon = parseFloat(lon);
+            configBuffer.tz = parseFloat(tz);
+            alert("GPS queued (pending APPLY)");
+            _updateQueueSummary();
+        }
+
+        function setWind() {
+            const val = document.getElementById("wind_input").value;
+            if (!val) { alert("Enter wind threshold"); return; }
+            configBuffer.wind_limit = parseFloat(val);
+            alert("Wind limit queued (pending APPLY)");
+            _updateQueueSummary();
+        }
+
+        // =========================================================================
+        //  SUN STEPPER
+        // =========================================================================
+        function adjustHour(id, delta) {
+            const input = document.getElementById(id);
+            let val = parseInt(input.value) + delta;
+            if (val < 0) val = 0;
+            if (val > 23) val = 23;
+            input.value = val;
+
+            const displayId = (id === 'sunrise_hour') ? 'sunrise_display' : 'sunset_display';
+            const display = document.getElementById(displayId);
+            if (display) display.innerText = String(val).padStart(2, '0');
+        }
+
+        function setSun() {
+            const sunrise = parseInt(document.getElementById('sunrise_hour').value);
+            const sunset = parseInt(document.getElementById('sunset_hour').value);
+            if (isNaN(sunrise) || isNaN(sunset)) { alert("Enter valid hours"); return; }
+            if (sunrise >= sunset) { alert("Sunrise must be earlier than sunset"); return; }
+            configBuffer.sunrise = String(sunrise).padStart(2, '0') + ":00";
+            configBuffer.sunset = String(sunset).padStart(2, '0') + ":00";
+            alert(`Sun window queued: ${sunrise}:00 → ${sunset}:00 (pending APPLY)`);
+            _updateQueueSummary();
+        }
+
+        // =========================================================================
+        //  APPLY
+        // =========================================================================
+        function sendAll() {
+            if (currentMode !== "manual") {
+                alert("⚠ Pico is not in MANUAL mode. Switch to Manual first.");
+                return;
+            }
+
+            if (Object.keys(configBuffer).length === 0) {
+                apiPost('/api/control', { cmd: "apply" })
+                    .then(() => {
+                        configBuffer = {};
+                        _updateQueueSummary();
+                        setTimeout(refreshData, 500);
+                        setTimeout(refreshData, 2000);
+                        alert("No changes queued — sent APPLY to resume AUTO.");
+                    });
+                return;
+            }
+
+            apiPost('/api/update', configBuffer)
+                .then(d => {
+                    if (d.status === "ok" || d.status === "partial") {
+                        if (d.status === "partial") {
+                            alert("⚠ Some settings had errors:\n" + d.errors.join("\n"));
+                        }
+                        return apiPost('/api/control', { cmd: "apply" });
+                    } else {
+                        throw new Error(d.error || "Update failed");
+                    }
+                })
+                .then(() => {
+                    configBuffer = {};
+                    _updateQueueSummary();
+                    setTimeout(refreshData, 500);
+                    setTimeout(refreshData, 2500);
+                    alert("Configuration applied — AUTO resuming.");
+                })
+                .catch(e => alert("❌ Error: " + e.message));
+        }
+
+        // =========================================================================
+        //  REFRESH DATA
+        // =========================================================================
+        function refreshData() {
+            fetch('/api/data', { headers: { 'x-api-key': 'svr123' } })
+
+                .then(r => r.json())
+                .then(d => {
+                    window._lastTelemetry = d;
+
+                    if (d.mode) syncModeFromTelemetry(d.mode);
+
+                    const rtcYear = safe(d.rtc_ok) ? d.rtc_date : null;
+                    if (rtcYear && d.rtc_time && d.rtc_date !== "2000-01-01") {
+                        document.getElementById('rtc_clock').innerText = d.rtc_time;
+                        document.getElementById('rtc_date_display').innerText = d.rtc_date;
+                    } else {
+                        document.getElementById('rtc_clock').innerText = d.rtc_time || "--:--:--";
+                        document.getElementById('rtc_date_display').innerText = safe(d.rtc_ok) ? d.rtc_date : "RTC Invalid";
+                    }
+
+                    document.getElementById('c_pulse').innerText = safe(d.cur_pulse);
+                    document.getElementById('t_pulse').innerText = safe(d.tar_pulse);
+                    document.getElementById('act_pulse').innerText = safe(d.act_pulse);
+                    document.getElementById('act_target').innerText = safe(d.act_target);
+
+                    document.getElementById('c_az').innerText = safe(d.cur_az).toFixed(1);
+                    document.getElementById('c_el').innerText = safe(d.cur_el).toFixed(1);
+                    document.getElementById('az_actual').innerText = safe(d.az_actual).toFixed(1);
+                    document.getElementById('el_actual').innerText = safe(d.el_actual).toFixed(1);
+
+                    const ds = safe(d.day_start, 0);
+                    const de = safe(d.day_end, 0);
+                    document.getElementById('day_window').innerText =
+                        `${String(ds).padStart(2, '0')}:00 / ${String(de).padStart(2, '0')}:00`;
+
+                    document.getElementById('ax').innerText = safe(d.ax).toFixed(3);
+                    document.getElementById('ay').innerText = safe(d.ay).toFixed(3);
+                    document.getElementById('az_imu').innerText = safe(d.az_imu).toFixed(3);
+                    document.getElementById('gx').innerText = safe(d.gx).toFixed(2);
+                    document.getElementById('gy').innerText = safe(d.gy).toFixed(2);
+                    document.getElementById('gz').innerText = safe(d.gz).toFixed(2);
+                    document.getElementById('pitch').innerText = safe(d.pitch).toFixed(2);
+                    document.getElementById('roll').innerText = safe(d.roll).toFixed(2);
+                    document.getElementById('yaw').innerText = safe(d.yaw).toFixed(2);
+
+                    const elDiff = safe(d.imu_el_diff);
+                    const vsEnc = safe(d.imu_vs_enc);
+                    const elAlert = safe(d.imu_el_alert);
+
+                    const elDiffEl = document.getElementById('imu_el_diff');
+                    const encAzEl = document.getElementById('imu_enc_az');
+                    const vsEncEl = document.getElementById('imu_vs_enc');
+                    const alertBadge = document.getElementById('imu_el_alert_badge');
+                    const imuStatusEl = document.getElementById('imu_status_text');
+
+                    if (elDiffEl) { elDiffEl.innerText = elDiff.toFixed(2); elDiffEl.style.color = Math.abs(elDiff) > 5 ? 'red' : 'green'; }
+                    if (encAzEl) encAzEl.innerText = safe(d.imu_enc_az).toFixed(2);
+                    if (vsEncEl) { vsEncEl.innerText = vsEnc.toFixed(2); vsEncEl.style.color = Math.abs(vsEnc) > 10 ? 'orange' : 'inherit'; }
+                    if (alertBadge) alertBadge.style.display = elAlert ? 'block' : 'none';
+                    if (imuStatusEl) {
+                        if (!safe(d.imu_ok)) {
+                            imuStatusEl.innerText = 'NOT OK'; imuStatusEl.style.color = 'red';
+                        } else if (safe(d.imu_alarm)) {
+                            imuStatusEl.innerText = 'TILT ALARM'; imuStatusEl.style.color = 'red';
+                        } else {
+                            imuStatusEl.innerText = 'OK'; imuStatusEl.style.color = 'green';
+                        }
+                    }
+
+                    const speed = safe(d.wind_speed);
+                    const limit = safe(d.wind_limit);
+                    document.getElementById('w_speed').innerText = speed.toFixed(1);
+                    document.getElementById('w_limit').innerText = limit.toFixed(1);
+
+                    const wSpeedEl = document.getElementById('w_speed');
+                    const windStatus = document.getElementById('wind_status');
+                    if (speed > limit && limit > 0) {
+                        if (wSpeedEl) wSpeedEl.style.color = "red";
+                        if (windStatus) { windStatus.innerText = "⚠ HIGH WIND"; windStatus.style.color = "red"; }
+                    } else if (speed > limit * 0.7 && limit > 0) {
+                        if (wSpeedEl) wSpeedEl.style.color = "orange";
+                        if (windStatus) { windStatus.innerText = "⚠ MODERATE"; windStatus.style.color = "orange"; }
+                    } else {
+                        if (wSpeedEl) wSpeedEl.style.color = "green";
+                        if (windStatus) { windStatus.innerText = "SAFE"; windStatus.style.color = "green"; }
+                    }
+
+                    document.getElementById('gps_val').innerText =
+                        `${safe(d.lat).toFixed(4)}, ${safe(d.lon).toFixed(4)}`;
+
+                    document.getElementById('tc_avg').innerText = safe(d.tc_avg).toFixed(1);
+
+                    document.getElementById('tc1_val').innerText = safe(d.tc_avg).toFixed(1) + " °C";
+                    document.getElementById('tc2_val').innerText = safe(d.tc_cj).toFixed(1) + " °C";
+                    document.getElementById('tc3_val').innerText = safe(d.tc_fault).toFixed(1) + " °C";
+                    
+
+                    // LEDs
+                    setLED("led_rtc", safe(d.rtc_ok));
+                    setLED("led_wind", safe(d.wind_speed) > 0 ? 1 : 0);
+                    setLED("led_gps", safe(d.lat) !== 0 ? 1 : 0);
+                    setLED("led_temp", safe(d.tc_ok));
+                    setLED("led_prox_az", safe(d.prox_az));
+                    setLED("led_prox_el", safe(d.prox_el));
+                    setLED("led_el_full", safe(d.el_full));
+                    setLED("led_imu_ok", safe(d.imu_ok));
+                    setLED("led_imu_alarm", safe(d.imu_alarm));
+                    setLED("led_wind_cool", safe(d.wind_cool));
+                    setLED("led_wind_park_az", safe(d.wind_park_az));
+                    setLED("led_wind_park_el", safe(d.wind_park_el));
+                    setLED("led_night_park", safe(d.night_park));
+                    setLED("led_synced", safe(d.synced));
+                    setLED("led_ishome", safe(d.ishome));
+                    setLED("led_is_homing", safe(d.is_homing));
+                    setLED("led_night_done", safe(d.night_done));
+                    setLED("led_moving_home", safe(d.moving_home));
+                    setLED("led_tc_ok", safe(d.tc_ok));
+                    setLED("led_tc_fault", safe(d.tc_fault) ? 1 : 0);
+                    setLED("led_step_az", safe(d.step_az) !== 0 ? 1 : 0);
+                    setLED("led_step_el", safe(d.step_el) !== 0 ? 1 : 0);
+                    setLED("led_az_home_miss", safe(d.az_home_miss));
+                    setLED("led_el_home_miss", safe(d.el_home_miss));
+                    setLED("led_nudge_cnt", safe(d.nudge_cnt) > 0 ? 1 : 0);
+                    setLED("led_el_nudge_cnt", safe(d.el_nudge_cnt) > 0 ? 1 : 0);
+
+                    // 3D panel
+                    if (typeof THREE !== 'undefined') {
+                        const azDeg = safe(d.az_actual);
+                        const elDeg = safe(d.el_actual);
+                        targetAz3d = THREE.MathUtils.degToRad(azDeg);
+                        targetEl3d = THREE.MathUtils.degToRad(elDeg);
+
+                        const dirLabels = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+                        const dirIndex = Math.round(azDeg / 22.5) % 16;
+                        const lAz = document.getElementById('lbl_az3d');
+                        const lEl = document.getElementById('lbl_el3d');
+                        const lDir = document.getElementById('lbl_dir3d');
+                        if (lAz) lAz.innerText = azDeg.toFixed(1) + '°';
+                        if (lEl) lEl.innerText = elDeg.toFixed(1) + '°';
+                        if (lDir) lDir.innerText = dirLabels[dirIndex >= 0 ? dirIndex : 0];
+                    }
+
+                    updateChart(safe(d.tc_avg), safe(d.tc_cj), safe(d.tc_avg));
+                })
+                .catch(e => console.log("Fetch error:", e));
+        }
+
+        setInterval(refreshData, 1500);
+
+        // =========================================================================
+        //  NOTIFICATIONS
+        // =========================================================================
+        function refreshNotifications() {
+            fetch('/api/notifications', { headers: { 'x-api-key': 'svr123' } })
+                .then(res => res.json())
+                .then(data => {
+                    const menu = document.getElementById('notif_menu');
+                    if (!menu) return;
+                    menu.innerHTML = '<li class="fw-bold mb-2">Recent Alerts</li>';
+                    if (data.length === 0) {
+                        menu.innerHTML += '<li class="small text-muted">No alerts yet</li>';
+                        return;
+                    }
+                    data.slice().reverse().forEach(n => {
+                        let color = "text-primary";
+                        if (n.level === "danger") color = "text-danger";
+                        if (n.level === "success") color = "text-success";
+                        menu.innerHTML += `<li class="small ${color} mb-1">● [${n.time}] ${n.msg}</li>`;
+                    });
+                })
+                .catch(() => { });
+        }
+        setInterval(refreshNotifications, 2000);
+
+        // =========================================================================
+        //  WEATHER
+        // =========================================================================
+        function updateWeather() {
+            fetch("https://api.open-meteo.com/v1/forecast?latitude=18.52&longitude=73.85&current_weather=true")
+                .then(res => res.json())
+                .then(data => {
+                    const w = data.current_weather;
+                    document.getElementById("weather_temp").innerText = w.temperature + "°C";
+                    document.getElementById("weather_status").innerText = w.weathercode > 2 ? "Cloudy" : "Clear";
+                })
+                .catch(() => { });
+        }
+        setInterval(updateWeather, 10000);
+        updateWeather();
+
+        // =========================================================================
+        //  ENERGY CHART
+        // =========================================================================
+ 
+
+// ── Combined TC1 / TC2 / TC3 chart ──────────────────────────────────────────
+let combinedTcChart = null;
+
+function initChart() {
+    const ctx = document.getElementById('combinedTcChart');
+    if (!ctx) return;
+
+    combinedTcChart = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'TC1 – (°C)',
+                    data: [],
+                    borderColor: '#e74c3c',
+                    backgroundColor: 'rgba(231,76,60,0.08)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'TC2 – (°C)',
+                    data: [],
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46,204,113,0.08)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'TC3 – (°C)',
+                    data: [],
+                    borderColor: '#f39221',
+                    backgroundColor: 'rgba(52,152,219,0.08)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    fill: false
+                },
+ {
+                    label: 'Avg (°C)',
+                    data: [],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52,152,219,0.08)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    fill: false
+                }
+
+            ]
+        },
+        options: {
+            responsive: true,
+            animation: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: { color: '#ccc', boxWidth: 14, font: { size: 11 } }
+                },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                y: {
+                    title: { display: true, text: 'Temperature (°C)', color: '#aaa' },
+                    ticks: { color: '#aaa' },
+                    grid:  { color: 'rgba(255,255,255,0.06)' }
+                },
+                x: {
+                    title: { display: true, text: 'Time', color: '#aaa' },
+                    ticks: { color: '#aaa', maxTicksLimit: 8 },
+                    grid:  { color: 'rgba(255,255,255,0.04)' }
+                }
+            }
+        }
+    });
+}
+
+// Called from refreshData with (tc1, tc2, tc3, avg) values
+function updateChart(tc1, tc2, tc3, avg) {
+    if (!combinedTcChart) return;
+
+    const time = new Date().toLocaleTimeString();
+
+    combinedTcChart.data.labels.push(time);
+    combinedTcChart.data.datasets[0].data.push(tc1);
+    combinedTcChart.data.datasets[1].data.push(tc2);
+    combinedTcChart.data.datasets[2].data.push(tc3);
+    combinedTcChart.data.datasets[3].data.push(avg);
+
+
+
+    // Keep last 40 readings
+    if (combinedTcChart.data.labels.length > 40) {
+        combinedTcChart.data.labels.shift();
+        combinedTcChart.data.datasets[0].data.shift();
+        combinedTcChart.data.datasets[1].data.shift();
+        combinedTcChart.data.datasets[2].data.shift();
+        combinedTcChart.data.datasets[3].data.shift();
+
+    }
+
+    combinedTcChart.update();
+}
+        // =========================================================================
+        //  TELEMETRY LOG CHART + TABLE
+        // =========================================================================
+        let telemetryChart = null;
+        let telemetryVisible = false;
+
+        function initTelemetryChart() {
+            const ctx = document.getElementById("telemetryChart");
+            if (!ctx || telemetryChart) return;
+            telemetryChart = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: "TC Avg", data: [], borderColor: '#e74c3c' },
+                        { label: "Az", data: [], borderColor: '#3498db' },
+                        { label: "El", data: [], borderColor: '#2ecc71' },
+                        { label: "Wind", data: [], borderColor: '#f39221' }
+                    ]
+                },
+                options: { responsive: true, animation: false }
+            });
+        }
+
+        async function updateTelemetryCSV() {
+            if (!telemetryVisible) return;
+            try {
+                const res = await fetch("/api/today", { headers: { "x-api-key": "svr123" } });
+                const data = await res.json();
+
+                if (telemetryChart) {
+                    telemetryChart.data.labels = data.map(d => d.time);
+                    telemetryChart.data.datasets[0].data = data.map(d => Number(d.tc_avg));
+                    telemetryChart.data.datasets[1].data = data.map(d => Number(d.az));
+                    telemetryChart.data.datasets[2].data = data.map(d => Number(d.el));
+                    telemetryChart.data.datasets[3].data = data.map(d => Number(d.wind));
+                    telemetryChart.update();
+                }
+
+                const table = document.getElementById("telemetryTable");
+                if (!table) return;
+                table.innerHTML = "";
+                data.slice(-50).forEach(d => {
+                    table.innerHTML += `<tr>
+                    <td>${d.time}</td><td>${d.tc_avg}</td>
+                    <td>${d.az}</td><td>${d.el}</td><td>${d.wind}</td>
+                </tr>`;
+                });
+            } catch (e) { console.log("CSV telemetry error:", e); }
+        }
+        setInterval(updateTelemetryCSV, 2000);
+
+        // =========================================================================
+        //  NAV + PANEL SWITCHING
+        // =========================================================================
+        function switchDash(id, el) {
+            if (id === 4) {
+                const pass = prompt("Enter Admin Password:");
+                if (pass !== "svr@123") { alert("❌ Access Denied!"); return; }
+            }
+
+            document.querySelectorAll('.dash-view').forEach(v => v.classList.add('hidden'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('dash' + id).classList.remove('hidden');
+            el.classList.add('active');
+
+            telemetryVisible = (id === 5);
+
+            if (id === 5) {
+                setTimeout(() => { initTelemetryChart(); updateTelemetryCSV(); }, 200);
+            }
+
+            const sidebar = document.getElementById("sidebar");
+            if (sidebar.classList.contains("open")) toggleSidebar();
+        }
+
+        function openPanel(name) {
+            document.getElementById("manualMenu").style.display = "none";
+            document.querySelectorAll('[id^="panel_"]').forEach(p => p.classList.add("hidden"));
+            document.getElementById("panel_" + name).classList.remove("hidden");
+
+            if (name === 'rtc') {
+                const ld = window._lastTelemetry || {};
+                const dateStr = ld.rtc_date || new Date().toISOString().split('T')[0];
+                const timeStr = ld.rtc_time || '00:00:00';
+                const parts = dateStr.split('-');
+                const tparts = timeStr.split(':');
+
+                const y = parseInt(parts[0]) || 2025;
+                const mo = parseInt(parts[1]) || 1;
+                const d = parseInt(parts[2]) || 1;
+                const h = parseInt(tparts[0]) || 0;
+                const mi = parseInt(tparts[1]) || 0;
+                const s = parseInt(tparts[2]) || 0;
+
+                document.getElementById('rtc_year_val').value = y;
+                document.getElementById('rtc_month_val').value = mo;
+                document.getElementById('rtc_day_val').value = d;
+                document.getElementById('rtc_hour_val').value = h;
+                document.getElementById('rtc_minute_val').value = mi;
+                document.getElementById('rtc_second_val').value = s;
+
+                document.getElementById('rtc_year_display').innerText = String(y);
+                document.getElementById('rtc_month_display').innerText = String(mo).padStart(2, '0');
+                document.getElementById('rtc_day_display').innerText = String(d).padStart(2, '0');
+                document.getElementById('rtc_hour_display').innerText = String(h).padStart(2, '0');
+                document.getElementById('rtc_minute_display').innerText = String(mi).padStart(2, '0');
+                document.getElementById('rtc_second_display').innerText = String(s).padStart(2, '0');
+            }
+
+            if (name === 'gps') {
+                const ld = window._lastTelemetry || {};
+                const latInput = document.getElementById('lat_input');
+                const lonInput = document.getElementById('lon_input');
+                if (latInput && ld.lat) latInput.value = ld.lat.toFixed(6);
+                if (lonInput && ld.lon) lonInput.value = ld.lon.toFixed(6);
+
+                const sel = document.getElementById('tz_select');
+                const cur = ld.tz !== undefined ? ld.tz : 5.5;
+                if (sel) {
+                    let best = 0, bestDiff = Infinity;
+                    for (let i = 0; i < sel.options.length; i++) {
+                        const diff = Math.abs(parseFloat(sel.options[i].value) - cur);
+                        if (diff < bestDiff) { bestDiff = diff; best = i; }
+                    }
+                    sel.selectedIndex = best;
+                }
+            }
+
+            if (name === 'sun') {
+                const ld = window._lastTelemetry || {};
+                const sr = ld.day_start !== undefined ? ld.day_start : 6;
+                const ss = ld.day_end !== undefined ? ld.day_end : 19;
+
+                document.getElementById('sunrise_hour').value = sr;
+                document.getElementById('sunset_hour').value = ss;
+
+                const srDisp = document.getElementById('sunrise_display');
+                const ssDisp = document.getElementById('sunset_display');
+                if (srDisp) srDisp.innerText = String(sr).padStart(2, '0');
+                if (ssDisp) ssDisp.innerText = String(ss).padStart(2, '0');
+            }
+        }
+
+        function goBack() {
+            document.getElementById("manualMenu").style.display = "block";
+            document.querySelectorAll('[id^="panel_"]').forEach(p => p.classList.add("hidden"));
+        }
+
+        // =========================================================================
+        //  PROFILE
+        // =========================================================================
+        function saveProfile() {
+            const existingSaved = JSON.parse(localStorage.getItem('svr_profiles') || '{}');
+            if (Object.keys(existingSaved).length >= 5) {
+                alert("⚠ Profile limit reached.\n\nOnly 5 custom profiles are allowed.\nDelete an existing profile to create a new one.");
+                return;
+            }
+            const userId = document.getElementById('new_userid').value.trim().toLowerCase().replace(/\s+/g, '');
+            const name = document.getElementById('new_name').value.trim();
+            const email = document.getElementById('new_email').value.trim();
+            const role = document.getElementById('new_role').value;
+            const file = document.getElementById('profile_photo').files[0];
+            const newPass = document.getElementById('new_pass').value;
+            const confirmPass = document.getElementById('confirm_pass').value;
+
+            if (!userId) { alert("Please enter a User ID"); return; }
+            if (!name || !email) { alert("Please fill mandatory fields"); return; }
+            if (!newPass) { alert("Please enter a password for this profile"); return; }
+            if (newPass !== confirmPass) { alert("Passwords do not match"); return; }
+            if (DEFAULT_USERS[userId]) { alert("Cannot overwrite a built-in account"); return; }
+            if (USERS[userId]) { alert(`User ID "${userId}" already exists. Choose a different one.`); return; }
+
+            const saved = JSON.parse(localStorage.getItem('svr_profiles') || '{}');
+            saved[userId] = newPass;
+            localStorage.setItem('svr_profiles', JSON.stringify(saved));
+
+            const meta = JSON.parse(localStorage.getItem('svr_profile_meta') || '{}');
+            meta[userId] = { name, email, role, pos: role };
+            localStorage.setItem('svr_profile_meta', JSON.stringify(meta));
+
+            USERS = loadUsers();
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const avatars = JSON.parse(localStorage.getItem('svr_avatars') || '{}');
+                    avatars[userId] = e.target.result;
+                    localStorage.setItem('svr_avatars', JSON.stringify(avatars));
+                    document.getElementById("header_avatar").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById("header_avatar").src =
+                    "https://ui-avatars.com/api/?name=" + encodeURIComponent(name) + "&background=f39221&color=fff";
+            }
+
+            document.getElementById('profile_name').innerText = name;
+            document.getElementById('profile_email').innerText = email;
+            document.getElementById('profile_pos').innerText = role;
+            document.getElementById('profile_role_sub').innerText = role;
+
+            const modalEl = document.getElementById('profileModal');
+            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modal.hide();
+            alert(`Profile created!\n\nLogin ID: ${userId}\nPassword: ${newPass}\n\nSave these credentials.`);
+        }
+
+        // =========================================================================
+        //  3D SOLAR PANEL
+        // =========================================================================
+        let scene, camera, renderer, panelGroup, compassNeedle;
+        let targetAz3d = 0, targetEl3d = 0;
+        let currentAz3d = 0, currentEl3d = 0;
+
+        function init3D() {
+            const container = document.getElementById("solar3d");
+            if (!container || typeof THREE === 'undefined') return;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f4f8);
+
+            camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+            camera.position.set(4, 3, 5);
+            camera.lookAt(0, 0.5, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(300, 300);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            const sun = new THREE.DirectionalLight(0xfff5e0, 1.8);
+            sun.position.set(5, 10, 5);
+            sun.castShadow = true;
+            scene.add(sun);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            const groundGeo = new THREE.CylinderGeometry(2.2, 2.2, 0.05, 64);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0xe8ecf0 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.position.y = -1.05;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            const cardinals = [
+                { label: 'N', angle: 0, color: 0xe74c3c },
+                { label: 'S', angle: Math.PI, color: 0x555555 },
+                { label: 'E', angle: Math.PI / 2, color: 0x555555 },
+                { label: 'W', angle: -Math.PI / 2, color: 0x555555 },
+            ];
+            cardinals.forEach(c => {
+                const pip = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.08, 0.12, 0.08),
+                    new THREE.MeshStandardMaterial({ color: c.color })
+                );
+                pip.position.set(Math.sin(c.angle) * 2.0, -0.95, Math.cos(c.angle) * 2.0);
+                scene.add(pip);
+            });
+
+            const pole = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.06, 0.08, 2.0, 16),
+                new THREE.MeshStandardMaterial({ color: 0x607d8b, metalness: 0.6, roughness: 0.4 })
+            );
+            pole.position.y = 0;
+            pole.castShadow = true;
+            scene.add(pole);
+
+            const flange = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.25, 0.3, 0.15, 32),
+                new THREE.MeshStandardMaterial({ color: 0x455a64, metalness: 0.7 })
+            );
+            flange.position.y = -1.0;
+            scene.add(flange);
+
+            panelGroup = new THREE.Group();
+            panelGroup.position.y = 1.0;
+            scene.add(panelGroup);
+
+            const arm = new THREE.Mesh(
+                new THREE.BoxGeometry(0.08, 0.08, 0.6),
+                new THREE.MeshStandardMaterial({ color: 0x78909c, metalness: 0.5 })
+            );
+            arm.position.set(0, 0, 0);
+            panelGroup.add(arm);
+
+            const panelPivot = new THREE.Group();
+            panelPivot.position.set(0, 0, 0);
+            panelGroup.add(panelPivot);
+
+            const frameGeo = new THREE.BoxGeometry(2.2, 1.3, 0.06);
+            const frameMat = new THREE.MeshStandardMaterial({ color: 0x263238, metalness: 0.3 });
+            const frame = new THREE.Mesh(frameGeo, frameMat);
+            panelPivot.add(frame);
+
+            const faceGeo = new THREE.BoxGeometry(2.05, 1.15, 0.07);
+            const faceMat = new THREE.MeshStandardMaterial({ color: 0x1a237e, metalness: 0.2, roughness: 0.5 });
+            const face = new THREE.Mesh(faceGeo, faceMat);
+            face.position.z = 0.02;
+            panelPivot.add(face);
+
+            const lineMat = new THREE.MeshStandardMaterial({ color: 0xb0bec5, metalness: 0.8 });
+            for (let i = -1; i <= 1; i++) {
+                const hLine = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.012, 0.08), lineMat);
+                hLine.position.set(0, i * 0.37, 0.04);
+                panelPivot.add(hLine);
+            }
+            for (let i = -2; i <= 2; i++) {
+                const vLine = new THREE.Mesh(new THREE.BoxGeometry(0.012, 1.1, 0.08), lineMat);
+                vLine.position.set(i * 0.41, 0, 0.04);
+                panelPivot.add(vLine);
+            }
+
+            const needleGroup = new THREE.Group();
+            needleGroup.position.y = -0.98;
+            scene.add(needleGroup);
+
+            const needleN = new THREE.Mesh(
+                new THREE.BoxGeometry(0.06, 0.04, 0.9),
+                new THREE.MeshStandardMaterial({ color: 0xe74c3c })
+            );
+            needleN.position.z = -0.45;
+            needleGroup.add(needleN);
+
+            const needleS = new THREE.Mesh(
+                new THREE.BoxGeometry(0.06, 0.04, 0.9),
+                new THREE.MeshStandardMaterial({ color: 0xffffff })
+            );
+            needleS.position.z = 0.45;
+            needleGroup.add(needleS);
+
+            compassNeedle = needleGroup;
+            panelGroup.userData.pivot = panelPivot;
+
+            animate3D();
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            if (!panelGroup || !renderer) return;
+
+            currentAz3d += (targetAz3d - currentAz3d) * 0.08;
+            currentEl3d += (targetEl3d - currentEl3d) * 0.08;
+
+            panelGroup.rotation.y = -currentAz3d;
+
+            const pivotEl = panelGroup.userData.pivot;
+            if (pivotEl) {
+                pivotEl.rotation.x = -(Math.PI / 2 - currentEl3d);
+            }
+
+            if (compassNeedle) {
+                compassNeedle.rotation.y = -currentAz3d;
+            }
+
+            renderer.render(scene, camera);
+        }
+        // =========================================
+// ENERGY TREND CHART
+// =========================================
+
+const energyCtx =
+document.getElementById('energyChart').getContext('2d');
+
+const energyChart = new Chart(energyCtx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: [
+            'Mon',
+            'Tue',
+            'Wed',
+            'Thu',
+            'Fri',
+            'Sat',
+            'Sun'
+        ],
+
+        datasets: [{
+
+            label: 'kJh Generated',
+
+            data: [120,140,180,160,210,190,240],
+
+            backgroundColor: [
+                '#1d0aec',
+                '#32a6e9',
+                '#f361bd',
+                '#c8e138',
+                '#e861b9',
+                '#6ab6c9',
+                '#2950d0'
+            ],
+
+            borderRadius: 10
+
+        }]
+    },
+
+    options: {
+
+        responsive:true,
+
+        plugins:{
+            legend:{
+                labels:{
+                    color:'#fff'
+                }
+            }
+        },
+
+        scales:{
+
+            x:{
+                ticks:{
+                    color:'#ccc'
+                }
+            },
+
+            y:{
+                ticks:{
+                    color:'#ccc'
+                }
+            }
+
+        }
+
+    }
+
+});
+
+
+
+// =========================================
+// THERMAL HEAT MAP
+// =========================================
+
+function updateHeatMap(){
+
+    for(let i=1;i<=5;i++){
+
+        const val = Math.random()*100;
+
+        const el = document.getElementById(`heat${i}`);
+
+        if(val < 30){
+
+            el.style.background = '#3498db';
+
+        }
+
+        else if(val < 60){
+
+            el.style.background = '#f1c40f';
+
+        }
+
+        else{
+
+            el.style.background = '#e74c3c';
+
+        }
+
+    }
+
+}
+
+setInterval(updateHeatMap,2000);
+
+
+
+// =========================================
+// ALERT SYSTEM
+// =========================================
+
+function updateAlerts(tc1, wind){
+
+    const panel =
+    document.getElementById('alertPanel');
+
+    let html = '';
+
+    if(tc1 > 350){
+
+        html += `
+        <div class="alert alert-danger">
+            ⚠ TC1 OVERHEAT DETECTED
+        </div>
+        `;
+
+    }
+
+    if(wind > 15){
+
+        html += `
+        <div class="alert alert-warning">
+            ⚠ HIGH WIND SPEED
+        </div>
+        `;
+
+    }
+
+    if(html === ''){
+
+        html = `
+        <div class="alert alert-success">
+            ✅ System Operating Normally
+        </div>
+        `;
+
+    }
+
+    panel.innerHTML = html;
+
+}
+
+
+
+// =========================================
+// SYSTEM HEALTH
+// =========================================
+
+function updateHealth(){
+
+    const health =
+    Math.floor(Math.random()*20)+80;
+
+    document.getElementById('healthValue')
+    .innerText = health + '%';
+
+    document.getElementById('healthCircle')
+    .style.background =
+    `conic-gradient(
+        #07411f 0deg,
+        #084120 ${health*3.6}deg,
+        #222 ${health*3.6}deg
+    )`;
+
+}
+
+setInterval(updateHealth,3000);
+
+
+
+// =========================================
+// EFFICIENCY
+// =========================================
+
+function updateEfficiency(){
+
+    const eff =
+    Math.floor(Math.random()*15)+75;
+
+    document.getElementById('efficiencyVal')
+    .innerText = eff + '%';
+
+}
+
+setInterval(updateEfficiency,4000);
+
+
+
+// =========================================
+// STORAGE TANK
+// =========================================
+
+function updateTank(){
+
+    const level =
+    Math.floor(Math.random()*40)+50;
+
+    document.getElementById('tankFill')
+    .style.height = level + '%';
+
+    document.getElementById('tankPercent')
+    .innerText = level + '%';
+
+}
+
+setInterval(updateTank,5000);
+
+
+
+// =========================================
+// TRACKER STATUS
+// =========================================
+
+const trackerStates = [
+
+    'TRACKING SUN ☀️',
+    'WIND PROTECTION 🌪️',
+    'PARKING MODE 🌙',
+    'AUTO ALIGNMENT 🔄'
+
+];
+
+let trackerIndex = 0;
+
+setInterval(()=>{
+
+    trackerIndex++;
+
+    if(trackerIndex >= trackerStates.length){
+
+        trackerIndex = 0;
+
+    }
+
+    document.getElementById('trackerStatus')
+    .innerText =
+    trackerStates[trackerIndex];
+
+},4000);
+
+
+
+// =========================================
+// LIVE DATA SIMULATION
+// =========================================
+
+setInterval(()=>{
+
+    const tc1 =
+    Math.random()*200+180;
+
+    const wind =
+    Math.random()*20;
+
+    updateAlerts(tc1, wind);
+
+},2000);
+        
+
+        // =========================================================================
+        //  INIT
+        // =========================================================================
+        window.addEventListener("load", () => {
+            initChart();
+            init3D();
+            refreshData();
+            refreshNotifications();
+            document.getElementById('profileModal').addEventListener('show.bs.modal', updateProfileSlotCount);
+        });
+    </script>
+</body>
+
+</html>
