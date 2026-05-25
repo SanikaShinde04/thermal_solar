@@ -1668,15 +1668,6 @@ def index():
 
 # =============================================================================
 
-@app.route("/api/data")
-def api_data():
-
-    print("📤 API DATA SENT:", telemetry)
-
-    return jsonify(telemetry)
-
-# =============================================================================
-
 @app.route("/api/wind")
 def api_wind():
 
@@ -1712,8 +1703,6 @@ def api_data():
 # =============================================================================
 
 RETENTION_DAYS = 5 * 365   # 5 years
-
-
 def cleanup_old_logs():
 
     try:
