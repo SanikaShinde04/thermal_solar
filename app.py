@@ -1694,9 +1694,21 @@ def api_wind():
         "status": status
     })
 
+# =============================================================================
+
+@app.route('/update', methods=['POST'])
+def update():
+    global latest_data
+    latest_data = request.json
+    return {"status": "ok"}
+
+@app.route('/api/data')
+def api_data():
+    return jsonify(latest_data)
+
 
 # =============================================================================
-# AUTO DELETE OLD CSV FILES (OLDER THAN 5 YEARS)
+# AUTO DELETE OLD CSV FILES (OLDER THAN 57 YEARS)
 # =============================================================================
 
 RETENTION_DAYS = 5 * 365   # 5 years
@@ -1940,10 +1952,6 @@ def update_settings():
         return jsonify({
             "error": str(e)
         }), 400
-
-# =============================================================================
-# MAIN
-# =============================================================================
 
 # =============================================================================
 # MAIN
