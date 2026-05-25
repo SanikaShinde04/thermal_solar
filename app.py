@@ -6,8 +6,9 @@ from flask_cors import CORS
 import serial
 import threading
 import time
-import json
 import csv
+import requests
+import json
 from datetime import datetime
 
 # # =============================================================================
@@ -948,37 +949,47 @@ def update_settings():
 # MAIN
 # =============================================================================
 
-# Replace the very end of your app.py with this:
+# =============================================================================
+# MAIN
+# =============================================================================
+
 if __name__ == "__main__":
-    
-        # Delete logs older than 5 years
+
+    # Delete logs older than 5 years
     cleanup_old_logs()
-    # 1. Initialize and start the Pico connection thread
-    t1 = threading.Thread(target=connect_pico, daemon=True)
-    t1.start()
-    
-    # 2. Small pause to allow Serial port to initialize
-    time.sleep(2)
 
-    # 3. Start the background reading thread
-    t2 = threading.Thread(target=read_pico_thread, daemon=True)
-    t2.start()
+    # Start Pico connection ONLY on local PC
+    if os.environ.get("RAILWAY_ENVIRONMENT") is None:
+        t1 = threading.Thread(target=connect_pico, daemon=True)
+        t1.start()
 
-    # 4. Start the snapshot logger
+        # Small delay for serial initialization
+        time.sleep(2)
+
+        # Start serial reader
+        t2 = threading.Thread(target=read_pico_thread, daemon=True)
+        t2.start()
+
+    # Snapshot logger
     t3 = threading.Thread(target=snapshot_thread, daemon=True)
     t3.start()
 
-    print("\n" + "="*40)
-    print("🚀 SOLAR TRACKER SCADA ONLINE")
-    print("📡 Listening on Port: " + PICO_PORT)
-    print("🌐 Dashboard URL: http://127.0.0.1:5000")
-    print("="*40 + "\n")
-    
-        # 5. Start CSV logger thread
+    # CSV logger
     t4 = threading.Thread(target=csv_logger_thread, daemon=True)
     t4.start()
 
-    # CRITICAL: debug MUST be False to prevent Serial Port PermissionErrors
-    # use_reloader=False is an extra safety measure
-    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
+    print("\n" + "=" * 40)
+    print("🚀 SOLAR TRACKER SCADA ONLINE")
+    print("🌐 Dashboard Running")
+    print("=" * 40 + "\n")
 
+    # Railway/Local Port
+    port = int(os.environ.get("PORT", 5000))
+
+    # Run Flask
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False,
+        use_reloader=False
+    )
